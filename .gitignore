@@ -18,6 +18,12 @@ doc/_build
 # no media files in repo
 media/
 
+# Disclude the migrations
+migrations/
+
+# Disclude the pycache
+__pycache__/
+
 # database not in repo
 db.sqlite3
 
