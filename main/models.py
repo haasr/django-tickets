@@ -27,7 +27,8 @@ class Ticket(models.Model):
                               related_name='owner',
                               blank=True,
                               null=True,
-                              verbose_name='Owner')
+                              verbose_name='Owner',
+                              on_delete=models.CASCADE)
 
     description = models.TextField('Description', blank=True, null=True)
 
@@ -47,7 +48,8 @@ class Ticket(models.Model):
                                     related_name='waiting_for',
                                     blank=True,
                                     null=True,
-                                    verbose_name='Waiting For')
+                                    verbose_name='Waiting For',
+                                    on_delete=models.CASCADE)
 
     # set in view when status changed to "DONE"
     closed_date = models.DateTimeField(blank=True, null=True)
@@ -56,7 +58,8 @@ class Ticket(models.Model):
                                     related_name='assigned_to',
                                     blank=True,
                                     null=True,
-                                    verbose_name='Assigned to')
+                                    verbose_name='Assigned to',
+                                    on_delete=models.CASCADE)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -69,11 +72,11 @@ class FollowUp(models.Model):
     """
     A FollowUp is a comment to a ticket.
     """
-    ticket = models.ForeignKey(Ticket, verbose_name='Ticket')
+    ticket = models.ForeignKey(Ticket, verbose_name='Ticket', on_delete=models.CASCADE)
     date = models.DateTimeField('Date', default=timezone.now)
     title = models.CharField('Title', max_length=200,)
     text = models.TextField('Text', blank=True, null=True,)
-    user = models.ForeignKey(User, blank=True, null=True, verbose_name='User')
+    user = models.ForeignKey(User, blank=True, null=True, verbose_name='User', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -95,12 +98,12 @@ def attachment_path(instance, filename):
     if settings.DEFAULT_FILE_STORAGE == "django.core.files. \
                                          storage.FileSystemStorage":
         if not os.path.exists(att_path):
-            os.makedirs(att_path, 0777)
+            os.makedirs(att_path, 777)
     return os.path.join(path, filename)
 
 
 class Attachment(models.Model):
-    ticket = models.ForeignKey(Ticket, verbose_name='Ticket')
+    ticket = models.ForeignKey(Ticket, verbose_name='Ticket', on_delete=models.CASCADE)
 
     file = models.FileField('File',
                             upload_to=attachment_path,
@@ -111,7 +114,8 @@ class Attachment(models.Model):
     user = models.ForeignKey(User,
                              blank=True,
                              null=True,
-                             verbose_name='User')
+                             verbose_name='User',
+                             on_delete=models.CASCADE)
 
     created = models.DateTimeField(auto_now_add=True)
 

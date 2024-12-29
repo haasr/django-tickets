@@ -1,5 +1,9 @@
-Django==1.8.4
-argparse==1.2.1
-django-crispy-forms==1.5.1
-email-reply-parser==0.3.0
-wsgiref==0.1.2
+asgiref==3.8.1
+crispy-bootstrap4==2024.10
+Django==5.1.4
+django-crispy-forms==2.3
+django-storages==1.14.4
+email-reply-parser==0.5.12
+python-dotenv==1.0.1
+sqlparse==0.5.3
+tzdata==2024.2

@@ -16,7 +16,7 @@
 
     <form action="#" method="post">
         {% csrf_token %}
-        {{ form | crispy }}
+        {% crispy form %}
         <input class="btn btn-primary" type="submit" value="Save Ticket" />
     </form>
 {% else %}
@@ -24,7 +24,7 @@
 
     <form action="/ticket/new/" method="post">
         {% csrf_token %}
-        {{ form | crispy }}
+        {% crispy form %}
         <input class="btn btn-primary" type="submit" value="Create new Ticket" />
     </form>
 {% endif %}

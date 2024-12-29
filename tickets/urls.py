@@ -1,75 +1,74 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls import patterns, include, url
+from django.urls import path, re_path, include
 from django.contrib import admin
 
 import main.views
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 
 # to include media files at the end
 from django.conf import settings
 from django.conf.urls.static import static
 
-urlpatterns = patterns(
-    '',
-
+urlpatterns = [
     # Login and settings pages
-    url(r'^$', 'django.contrib.auth.views.login'),
+    re_path(r'^$', LoginView.as_view(), name='login'),
 
-    url(r'^logout/$', 'django.contrib.auth.views.logout_then_login'),
+    re_path(r'^logout/$', main.views.log_out, name='logout'),
 
-    url(r'^settings/$',
+    re_path(r'^settings/$',
         login_required(main.views.usersettings_update_view),
         name='user-settings'),
 
     # Django admin
-    url(r'^admin/', include(admin.site.urls)),
+    re_path(r'^admin/', admin.site.urls),  # No include() needed
 
     # create new ticket
-    url(r'^ticket/new/$',
+    re_path(r'^ticket/new/$',
         login_required(main.views.ticket_create_view),
         name='ticket_new'),
 
     # edit ticket
-    url(r'^ticket/edit/(?P<pk>\d+)/$',
+    re_path(r'^ticket/edit/(?P<pk>\d+)/$',
         login_required(main.views.ticket_edit_view),
         name='ticket_edit'),
 
     # view ticket
-    url(r'^ticket/(?P<pk>\d+)/$',
+    re_path(r'^ticket/(?P<pk>\d+)/$',
         login_required(main.views.ticket_detail_view),
         name='ticket_detail'),
 
     # create new followup
-    url(r'^followup/new/$',
+    re_path(r'^followup/new/$',
         login_required(main.views.followup_create_view),
         name='followup_new'),
 
     # edit followup
-    url(r'^followup/edit/(?P<pk>\d+)/$',
+    re_path(r'^followup/edit/(?P<pk>\d+)/$',
         login_required(main.views.followup_edit_view),
         name='followup_edit'),
 
     # create new attachment
-    url(r'^attachment/new/$',
+    re_path(r'^attachment/new/$',
         login_required(main.views.attachment_create_view),
         name='attachment_new'),
 
     # ticket overviews
-    url(r'^inbox/$',
+    re_path(r'^inbox/$',
         login_required(main.views.inbox_view),
         name='inbox'),
 
-    url(r'^my-tickets/$',
+    re_path(r'^my-tickets/$',
         login_required(main.views.my_tickets_view),
         name='my-tickets'),
 
-    url(r'^all-tickets/$',
+    re_path(r'^all-tickets/$',
         login_required(main.views.all_tickets_view),
         name='all-tickets'),
 
-    url(r'^archive/$',
+    re_path(r'^archive/$',
         login_required(main.views.archive_view),
         name='archive'),
 
-) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+ ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,11 +2,16 @@
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import dotenv
 import socket
-# request.path in templates:
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
+from dotenv import load_dotenv
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+load_dotenv('.env')
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
@@ -30,36 +35,75 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
+
+    # Project:
     'main',
+
+    # 3rd party:
+    'crispy_bootstrap4',
+    'crispy_forms',
+    'storages',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = TCP + (
-    'django.core.context_processors.request',
-)
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'  # Use Django's default for now
 
-MIDDLEWARE_CLASSES = (
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 ROOT_URLCONF = 'tickets.urls'
 
 WSGI_APPLICATION = 'tickets.wsgi.application'
 
 # Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 # Internationalization
 
@@ -91,7 +135,7 @@ LOGIN_REDIRECT_URL = "/inbox/"
 LOGIN_URL = "/"
 
 # Django Crispy Forms
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Define who gets code error notifications.
 # When DEBUG=False and a view raises an exception,
@@ -105,9 +149,12 @@ MANAGERS = ((os.environ["DJANGO_ADMIN_NAME"],
              os.environ["DJANGO_ADMIN_EMAIL"]), )
 
 # Email delivery to local Postfix-Installation
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
 EMAIL_HOST = os.environ["DJANGO_EMAIL_HOST"]
 EMAIL_HOST_USER = os.environ["DJANGO_EMAIL_HOST_USER"]
 EMAIL_HOST_PASSWORD = os.environ["DJANGO_EMAIL_HOST_PASSWORD"]
+EMAIL_PORT = 587
 
 # Logging
 LOGGING = {

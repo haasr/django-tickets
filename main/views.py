@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render, render_to_response, redirect
-from django.template import RequestContext
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.core.mail import send_mail
+from django.urls import reverse
 
 from .models import Ticket, Attachment, FollowUp
 from .forms import UserSettingsForm
@@ -23,41 +24,37 @@ def inbox_view(request):
     tickets_unassigned = Ticket.objects.all().exclude(assigned_to__in=users)
     tickets_assigned = Ticket.objects.filter(assigned_to__in=users)
 
-    return render_to_response('main/inbox.html',
-                              {"tickets_assigned": tickets_assigned,
-                               "tickets_unassigned": tickets_unassigned, },
-                              context_instance=RequestContext(request))
+    ctx = {
+        "tickets_assigned": tickets_assigned,
+        "tickets_unassigned": tickets_unassigned,
+    }
+
+    return render(request, 'main/inbox.html', context=ctx)
 
 
 def my_tickets_view(request):
-
     tickets = Ticket.objects.filter(assigned_to=request.user) \
                     .exclude(status__exact="DONE")
     tickets_waiting = Ticket.objects.filter(waiting_for=request.user) \
                                     .filter(status__exact="WAITING")
 
-    return render_to_response('main/my-tickets.html',
-                              {"tickets": tickets,
-                               "tickets_waiting": tickets_waiting},
-                              context_instance=RequestContext(request))
+    return render(request, 'main/my-tickets.html',
+                 {"tickets": tickets,
+                  "tickets_waiting": tickets_waiting})
 
 
 def all_tickets_view(request):
-
     tickets_open = Ticket.objects.all().exclude(status__exact="DONE")
 
-    return render_to_response('main/all-tickets.html',
-                              {"tickets": tickets_open, },
-                              context_instance=RequestContext(request))
+    return render(request, 'main/all-tickets.html',
+                 {"tickets": tickets_open})
 
 
 def archive_view(request):
-
     tickets_closed = Ticket.objects.filter(status__exact="DONE")
 
-    return render_to_response('main/archive.html',
-                              {"tickets": tickets_closed, },
-                              context_instance=RequestContext(request))
+    return render(request, 'main/archive.html',
+                 {"tickets": tickets_closed})
 
 
 def usersettings_update_view(request):
@@ -222,3 +219,8 @@ def attachment_create_view(request):
     return render(request,
                   'main/attachment_add.html',
                   {'form': form, })
+
+
+def log_out(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('login'))
